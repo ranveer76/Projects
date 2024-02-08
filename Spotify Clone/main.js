@@ -1,4 +1,7 @@
 console.log("Welcome");
+
+const web_name = "http://127.0.0.1:5500/Spotify%20Clone/songs/";
+
 let playlist = {};
 function doesPlaylistHaveSongs(playlistName) {
     const mp3Extension = ".mp3";
@@ -39,7 +42,7 @@ var currentsong = localStorage.getItem('song');
 // }
 
 async function getplaylist() {
-    const response = await fetch('http://127.0.0.1:5500/songs');
+    const response = await fetch(web_name);
     const data = await response.text();
     let div = document.createElement('div');
     div.innerHTML = data;
@@ -61,24 +64,36 @@ async function getplaylist() {
 
 async function main() {
     playlist = await getplaylist();
+    console.log(playlist);
     await getsong();
+    let element=document.getElementsByClassName('main')[0];
     for (let i in playlist) {
         if (doesPlaylistHaveSongs(playlist[i][0])) {
-            let div = document.createElement("div");
-            div.classList.add("list");
-            div.id= playlist[i][0];
-
+            element.innerHTML +=`<h2>${playlist[i][0]}</h2><div class="list" id="${playlist[i][0]}"></div>`;
+            let e = document.getElementById(playlist[i][0]);
+            for(let j=1;j<playlist[i].length;j++){
+                let song_name = playlist[i][j].split(".mp3")[0].split("[")[0];
+                let song_desc = playlist[i][j].split("]")[0].split("[")[1];
+                // console.log(song_desc);
+                e.innerHTML +=`<div class="item" id="${playlist[i][j]}">
+                <img src="./songs/${playlist[i][0]}/${song_name.replaceAll(" ","")}.jpg" alt="" />
+                <div class="play">
+                <img class="p-2" src="./images/play_logo.svg" alt="" />
+                </div>
+                <div class="text">
+                <h4>${song_name}</h4>
+                <p>${song_desc}</p>
+                </div>
+                </div>`;
+                // console.log(playlist[i][j]);
+            }
         }
     }
-
 }
-
-main();
-
 
 async function getsong() {
     for (let i in playlist) {
-        const response = await fetch(`http://127.0.0.1:5500/songs/${playlist[i]}`);
+        const response = await fetch(web_name+"/"+playlist[i]);
         const data = await response.text();
         let div = document.createElement('div');
         div.innerHTML = data;
