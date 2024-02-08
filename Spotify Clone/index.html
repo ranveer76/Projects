@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Spotify</title>
+        <link rel="shortcut icon" href="./images/favicon.png" type="image/x-icon">
+        <link rel="stylesheet" href="./style.css">
+        <link rel="stylesheet" href="./utility.css">
+        <script src="main.js" defer></script>
+    </head>
+    <body>
+        <div class="left">
+            <div class="home m-1 b-1 bg-grey p-1">
+                <ul>
+                    <li>
+                        <a class="flex i-c g-1 op-1 active" href="/">
+                            <img class="img-1 invert-1" src="./images/home.svg" alt="home">
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex i-c g-1 op-1" href="/search">
+                            <img class="img-1 invert-1" src="./images/search.svg" alt="search">
+                            <span>Search</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="library m-1 b-1 bg-grey p-1">
+                <ul class="flex i-c j-sb">
+                    <li>
+                        <a class="flex i-c g-1 op-1" href="/library">
+                            <img class="img-1 invert-1" src="./images/lib.svg" alt="library">
+                            <span>Your Library</span>
+                        </a>
+                    </li>
+                    <li class="flex i-c g-1">
+                        <a class="op-1 wh-2" href="#">
+                            <img class="invert-1" src="./images/plus.svg" alt="add">
+                        </a>
+                        <a class="op-1 wh-2" href="#">
+                            <img class="invert-1" src="./images/right_arrow.svg" alt="more">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="right m-1 b-1 bg-grey">
+            <div class="head b-1 p-1">
+                <ul class="flex j-sb i-c">
+                    <li class="flex i-c g-2">
+                        <a class="flex i-c j-c bg-black75 b-c p-3 op-1" href="#">
+                            <img class="invert-1 img-2" src="./images/left.svg" alt="prev">
+                        </a>
+                        <a class="flex i-c j-c bg-black75 b-c p-3 op-1" href="#">
+                            <img class="invert-1 img-2" src="./images/right.svg" alt="next">
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex i-c j-c bg-black75 b-c p-2 op-1" href="#">
+                            <img class="img-2" src="./images/favicon.png" alt="">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="main b-1">
+                <h2>Good Morning</h2>
+                <div class="list">
+
+                </div>
+            </div>
+        </div>
+        <div class="bottom b-1 bg-black flex i-c j-sb">
+            <div class="song_info flex i-c p-2">
+                <img class="img-3 b-1 m-1" src="./songs/my playlist/25ToLife.jpg" alt="">
+                <div class="text">
+                    <h4 class="animate">Daily music ijfhi u d hvuehwufho</h4>
+                    <p class="animate">Lorem ipsum dolor sincnoeuofnennkcnlneovoen</p>
+                </div>
+            </div>
+            <div class="song_controls">
+                <div class="controls">
+                    <ul class="flex i-c j-c g-2">
+                        <li>
+                            <img class="img-2 invert-1 op-1" src="./images/shuffle.svg" alt="">
+                        </li>
+
+                        <li>
+                            <img class="img-2 invert-1 op-1" src="./images/prev_song.svg" alt="">
+                        </li>
+                        <li class="play">
+                            <img id="playpause" class="img-2 p-2 bg-white b-c op-1 active" src="./images/play_logo.svg" alt="">
+                        </li>
+                        <li>
+                            <img class="img-2 invert-1 op-1 rotate" src="./images/prev_song.svg" alt="">
+                        </li>
+                        <li>
+                            <img class="img-2 invert-1 op-1" src="./images/repeat_song.svg" alt="">
+                        </li>
+                    </ul>
+                </div>
+                <div class="playbar flex i-c g-2">
+                    <span>00:00</span><input value="20" min="0" max="100" type="range" name="play-bar" id="play-bar" /><span>00:00</span>
+                </div>
+            </div>
+            <div class="song_vol">
+                <ul class="flex i-c g-2 m-2">
+                    <li class="flex m-1">
+                        <img class="img-2 invert-1 op-1" src="./images/now-view.svg" alt="">
+                    </li>
+                    <li class="flex m-1">
+                        <img class="img-2 invert-1 op-1" src="./images/mic.svg" alt="">
+                    </li>
+                    <li class="flex m-1">
+                        <img class="img-2 invert-1 op-1" src="./images/queue.svg" alt="">
+                    </li>
+                    <li class="flex m-1">
+                        <img class="img-2 invert-1 op-1" src="./images/devices.svg" alt="">
+                    </li>
+                    <li class="flex i-c g-2">
+                        <img class="img-2 invert-1 op-1" src="./images/volume.svg" alt="">
+                        <input type="range" name="volume" id="volume" min="0" max="100" value="100">
+                    </li>
+                    <li class="flex m-1">
+                        <img class="img-2 invert-1 op-1" src="./images/miniplayer.svg" alt="">
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </body>
+</html>
