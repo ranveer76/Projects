@@ -73,38 +73,46 @@ song_desc = data['songdesc'];
 song_img = data['songimg'];
 
 async function getplaylist() {
-    const response = await fetch(web_name);
-    const data = await response.text();
-    let div = document.createElement('div');
-    div.innerHTML = data;
-    let playlists = {};
-
-    let as = div.getElementsByTagName('a');
-    for (let i = 0; i < as.length; i++) {
-        let x = (as[i].href).split("/songs/");
-        if (x[1] != undefined) {
-            let playlistName = x[1].replaceAll("%20", " ");
-            if (!playlists[playlistName]) {
-                playlists[playlistName] = [];
-            }
-            playlists[playlistName].push(as[i].title);
-        }
-    }
-    return playlists;
-}
-async function getsong() {
-    for (let i in playlist) {
-        const response = await fetch("./songs/" + playlist[i]);
+    try{
+        const response = await fetch(web_name);
         const data = await response.text();
         let div = document.createElement('div');
         div.innerHTML = data;
+        let playlists = {};
+    
         let as = div.getElementsByTagName('a');
-        for (let j = 0; j < as.length; j++) {
-            let x = as[j].title;
-            if (x.endsWith('.mp3')) {
-                playlist[i].push(x);
+        for (let i = 0; i < as.length; i++) {
+            let x = (as[i].href).split("/songs/");
+            if (x[1] != undefined) {
+                let playlistName = x[1].replaceAll("%20", " ");
+                if (!playlists[playlistName]) {
+                    playlists[playlistName] = [];
+                }
+                playlists[playlistName].push(as[i].title);
             }
         }
+        return playlists;
+    } catch (e) {
+        console.log(e);
+    }
+}
+async function getsong() {
+    try{
+        for (let i in playlist) {
+            const response = await fetch("./songs/" + playlist[i]);
+            const data = await response.text();
+            let div = document.createElement('div');
+            div.innerHTML = data;
+            let as = div.getElementsByTagName('a');
+            for (let j = 0; j < as.length; j++) {
+                let x = as[j].title;
+                if (x.endsWith('.mp3')) {
+                    playlist[i].push(x);
+                }
+            }
+        }
+    } catch (e){
+        console.log(e);
     }
 }
 
@@ -136,7 +144,11 @@ function createElement() {
 }
 
 function playsong(){
-    playingsong.play();
+    try{
+        playingsong.play();
+    } catch (e) {
+        console.log(e);
+    }
     document.getElementById("playpause").src='./images/pause_logo.svg';
     let e= document.getElementsByClassName("song_info")[0];
     e.getElementsByTagName("img")[0].src = song_img;
@@ -145,7 +157,11 @@ function playsong(){
     // console.log(song_name, song_img, song_desc);
 }
 function pausesong(){
-    playingsong.pause();
+    try{
+        playingsong.pause();
+    } catch{
+        console.log(e);
+    }
     document.getElementById("playpause").src='./images/play_logo.svg';
 }
 function next_play(){
@@ -195,10 +211,15 @@ function onclickitem(){
 }
 
 async function main() {
-    playlist = await getplaylist();
-    // console.log(playlist);
-    await getsong();
-    createElement();
+    try{
+        playlist = await getplaylist();
+        // console.log(playlist);
+        await getsong();
+        createElement();
+    } catch(e) {
+        console.log(e);
+    }
+
     playingsong = new Audio(currentsong);
     duration = stm(playingsong.duration);
     current_time = stm(playingsong.currentTime);
