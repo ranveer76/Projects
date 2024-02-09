@@ -1,5 +1,6 @@
 // console.log("Welcome");
-const web_name = (window.location.pathname).split("index")[0]+"songs/";
+// const web_name = (window.location.pathname).split("index")[0]+"songs/";
+const web_name = "./songs/";
 let data;
 var currentsong;
 var song_name;
@@ -70,14 +71,6 @@ currentsong = data['currentsong'];
 song_name = data['songname'];
 song_desc = data['songdesc'];
 song_img = data['songimg'];
-
-
-// function playSong(song) {
-//     currentsong = new Audio(song);
-//     localStorage.setItem('song', song);
-//     currentsong.play();
-//     document.getElementById("playpause").src='./images/pause_logo.svg';
-// }
 
 async function getplaylist() {
     const response = await fetch(web_name);
