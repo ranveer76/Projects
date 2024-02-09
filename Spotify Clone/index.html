@@ -70,10 +70,10 @@
         </div>
         <div class="bottom b-1 bg-black flex i-c j-sb">
             <div class="song_info flex i-c p-2">
-                <img class="img-3 b-1 m-1" src="./songs/my playlist/25ToLife.jpg" alt="">
+                <img class="img-3 b-1 m-1" src="" alt="">
                 <div class="text">
-                    <h4 class="animate">Daily music ijfhi u d hvuehwufho</h4>
-                    <p class="animate">Lorem ipsum dolor sincnoeuofnennkcnlneovoen</p>
+                    <h4></h4>
+                    <p></p>
                 </div>
             </div>
             <div class="song_controls">
@@ -84,13 +84,13 @@
                         </li>
 
                         <li>
-                            <img class="img-2 invert-1 op-1" src="./images/prev_song.svg" alt="">
+                            <img class="img-2 invert-1 op-1" id="prev" src="./images/prev_song.svg" alt="">
                         </li>
                         <li class="play">
                             <img id="playpause" class="img-2 p-2 bg-white b-c op-1 active" src="./images/play_logo.svg" alt="">
                         </li>
                         <li>
-                            <img class="img-2 invert-1 op-1 rotate" src="./images/prev_song.svg" alt="">
+                            <img class="img-2 invert-1 op-1 rotate" id="next" src="./images/prev_song.svg" alt="">
                         </li>
                         <li>
                             <img class="img-2 invert-1 op-1" src="./images/repeat_song.svg" alt="">
@@ -98,7 +98,7 @@
                     </ul>
                 </div>
                 <div class="playbar flex i-c g-2">
-                    <span>00:00</span><input value="20" min="0" max="100" type="range" name="play-bar" id="play-bar" /><span>00:00</span>
+                    <span id="current_time">00:00</span><input value="0" min="0" max="100" type="range" name="play-bar" class="play-bar" id="play-bar" /><span id="duration">00:00</span>
                 </div>
             </div>
             <div class="song_vol">
