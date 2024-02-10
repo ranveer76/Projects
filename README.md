@@ -1,1 +1,1 @@
-[Spotify Clone]:"https://ranveer76.github.io/Projects/"
+[Spotify Clone] https://ranveer76.github.io/Projects/
