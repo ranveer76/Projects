@@ -22,7 +22,6 @@ function getlocal() {
             "currentsong": "",
             "songname": "",
             "songdesc": "",
-            "songimg": ""
         }
     }
     return data;
@@ -34,15 +33,13 @@ async function dataset(e) {
     currentsong = e.id;
     song_name = e.getElementsByTagName("h4")[0].innerHTML;
     song_desc = e.getElementsByTagName("p")[0].innerHTML;
-    song_img = e.getElementsByTagName("img")[0].src;
+    song_img = await getImageUrl(currentsong.split("/")[0], song_name.replaceAll(" ", "") + ".jpg");
     data = {
         "currentsong": currentsong,
         "songname": song_name,
         "songdesc": song_desc,
-        "songimg": song_img
     }
     setlocal(data);
-    playingsong.src = await play_Song(currentsong.split("/"));
 }
 function doesPlaylistHaveSongs(playlistName) {
     const mp3Extension = ".mp3";
@@ -72,13 +69,12 @@ function stm(seconds) {
 currentsong = data['currentsong'];
 song_name = data['songname'];
 song_desc = data['songdesc'];
-song_img = data['songimg'];
 
 async function getplaylist() {
     try {
         const response = await fetch('http://localhost:3000/api/playlists'); // Fetch from the server endpoint
         const playlists = await response.json();
-        var playlist={};
+        var playlist = {};
         for (const i of playlists) {
             playlist[i] = await getSongsInPlaylist(i);
         }
@@ -94,7 +90,7 @@ async function getSongsInPlaylist(playlistName) {
         const songs = await response.json();
         let song = [];
         for (const i of songs) {
-            if(i.endsWith(".mp3")){
+            if (i.endsWith(".mp3")) {
                 song.push(i);
             }
         }
@@ -105,18 +101,18 @@ async function getSongsInPlaylist(playlistName) {
     }
 }
 
-function createElement() {
+async function createElement() {
     let element = document.getElementsByClassName('main')[0];
     for (let i in playlist) {
         if (doesPlaylistHaveSongs(i)) {
             element.innerHTML += `<h2>${i}</h2><div class="list" id="${i}"></div>`;
             let e = document.getElementById(i);
             for (let j = 0; j < playlist[i].length; j++) {
-                let song_name = playlist[i][j].split(".mp3")[0].split("[")[0];
+                let song_name = playlist[i][j].split("[")[0];
                 let song_desc = playlist[i][j].split("]")[0].split("[")[1];
                 // console.log(song_desc);
                 e.innerHTML += `<div class="item" id="${i + '/' + playlist[i][j]}">
-            <img src="./songs/${i}/${song_name.replaceAll(" ", "")}.jpg" alt="" />
+            <img src="${await getImageUrl(i, song_name.replaceAll(" ", "") + ".jpg")}" alt="" />
             <div class="play">
             <img class="p-2" src="./images/play_logo.svg" alt="" />
             </div>
@@ -129,8 +125,19 @@ function createElement() {
             }
         }
     }
+    onclickitem();
+    updateDynamicContent();
 }
-
+async function getImageUrl(p, songPath) {
+    try {
+        const response = await fetch(`http://localhost:3000/api/images/${p}/${songPath}`);
+        const imageBlob = await response.blob();
+        const imageUrl = await URL.createObjectURL(imageBlob);
+        return imageUrl;
+    } catch (error) {
+        console.error('Error fetching image:', error);
+    }
+}
 // Example client-side code
 const play_Song = async (playlist) => {
     try {
@@ -171,7 +178,7 @@ async function next_play() {
     // console.log(playlist[a[0]].indexOf(a[1]));
     // console.log(playlist);
     if (index + 1 < playlist[a[0]].length) {
-        let e = document.getElementById(a[0]).getElementsByClassName("item")[index+1];
+        let e = document.getElementById(a[0]).getElementsByClassName("item")[index + 1];
         dataset(e);
         playingsong.src = await play_Song(currentsong.split("/"));
         playsong();
@@ -187,7 +194,7 @@ async function prev_play() {
     let a = currentsong.split('/');
     let index = playlist[a[0]].indexOf(a[1]);
     if (index - 1 >= 0) {
-        let e = document.getElementById(a[0]).getElementsByClassName("item")[index -1];
+        let e = document.getElementById(a[0]).getElementsByClassName("item")[index - 1];
         dataset(e);
         playingsong.src = await play_Song(currentsong.split("/"));
         playsong();
@@ -202,6 +209,7 @@ async function prev_play() {
 function onclickitem() {
     Array.from(document.getElementsByClassName("list")).forEach(element => {
         Array.from(element.getElementsByClassName("item")).forEach(e => {
+            // console.log(e);
             e.addEventListener("click", async function () {
                 dataset(e);
                 playingsong.src = await play_Song(currentsong.split("/"));
@@ -219,15 +227,13 @@ async function main() {
     } catch (e) {
         console.log(e);
     }
-
-    updateDynamicContent();
+    song_img = await getImageUrl(currentsong.split("/")[0], song_name.replaceAll(" ", "") + ".jpg");
     playingsong.src = await play_Song(currentsong.split("/"));
     // playingsong.play();
     duration = stm(playingsong.duration);
     current_time = stm(playingsong.currentTime);
 
     // console.log(currentsong);
-    onclickitem();
     document.getElementById("playpause").addEventListener("click", function () {
         if (playingsong.paused) {
             playsong();
@@ -241,7 +247,6 @@ async function main() {
     var prev = document.getElementById("prev");
     next.addEventListener("click", async function () { await next_play(); });
     prev.addEventListener("click", async function () { await prev_play(); });
-
     playingsong.addEventListener("loadeddata", () => {
         duration = stm(playingsong.duration);
         current_time = stm(playingsong.currentTime);
@@ -251,6 +256,7 @@ async function main() {
         e.getElementsByTagName("img")[0].src = song_img;
         e.getElementsByTagName("h4")[0].innerHTML = song_name;
         e.getElementsByTagName("p")[0].innerHTML = song_desc;
+        updateDynamicContent();
     });
     playingsong.addEventListener("timeupdate", async () => {
         duration = playingsong.duration;
@@ -290,6 +296,20 @@ function updateDynamicContent(callback) {
     const textElements = document.querySelectorAll(".text p");
 
     textElements.forEach(element => {
+        const scrollContainer = element.closest(".text");
+        // console.log("Element:", element);
+        // console.log("Scroll Width:", element.scrollWidth);
+        // console.log("Container Width:", scrollContainer.offsetWidth);
+        if (element.scrollWidth > scrollContainer.offsetWidth) {
+            element.classList.add("animate");
+        } else {
+            element.classList.remove("animate");
+        }
+
+    });
+    const textElement = document.querySelectorAll(".text h4");
+
+    textElement.forEach(element => {
         const scrollContainer = element.closest(".text");
         // console.log("Element:", element);
         // console.log("Scroll Width:", element.scrollWidth);
