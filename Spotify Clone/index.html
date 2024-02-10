@@ -8,6 +8,65 @@
         <link rel="stylesheet" href="./style.css">
         <link rel="stylesheet" href="./utility.css">
         <script src="./main.js" defer></script>
+        <style>
+            @media (width < 950px) {
+                body {
+                    grid-template-columns: 280px auto;
+                }
+
+                .song_controls {
+                    margin-right: 10%;
+                }
+
+                .song_vol {
+                    display: none;
+                }
+            }
+
+            @media (width < 600px) {
+                body {
+                    grid-template-columns: 45px auto;
+                }
+
+                .left {
+                    grid-template-rows: 80px auto;
+                }
+
+                .left .p-1 {
+                    padding: 2px;
+                }
+
+                .home ul li,
+                .library ul li {
+                    margin: 5px;
+                }
+
+                .library li:nth-child(2),
+                .left span {
+                    display: none;
+                }
+            }
+
+            @media (width < 550px) {
+                .bottom .song_controls {
+                    min-width: 80px;
+                    width: 60%;
+                    margin-right: 2px;
+                }
+            }
+
+            @media (width < 450px) {
+                .bottom .song_info .text {
+                    display: none;
+                }
+
+                .bottom .song_controls {
+                    min-width: 80px;
+                    width: 80%;
+                    margin-right: 6px;
+                }
+            }
+        </style>
     </head>
     <body>
         <div class="left">
@@ -87,7 +146,8 @@
                             <img class="img-2 invert-1 op-1" id="prev" src="./images/prev_song.svg" alt="">
                         </li>
                         <li class="play">
-                            <img id="playpause" class="img-2 p-2 bg-white b-c op-1 active" src="./images/play_logo.svg" alt="">
+                            <img id="playpause" class="img-2 p-2 bg-white b-c op-1 active" src="./images/play_logo.svg"
+                                alt="">
                         </li>
                         <li>
                             <img class="img-2 invert-1 op-1 rotate" id="next" src="./images/prev_song.svg" alt="">
@@ -98,7 +158,8 @@
                     </ul>
                 </div>
                 <div class="playbar flex i-c g-2">
-                    <span id="current_time">00:00</span><input value="0" min="0" max="100" type="range" name="play-bar" class="play-bar" id="play-bar" /><span id="duration">00:00</span>
+                    <span id="current_time">00:00</span><input value="0" min="0" max="100" type="range" name="play-bar"
+                        class="play-bar" id="play-bar" /><span id="duration">00:00</span>
                 </div>
             </div>
             <div class="song_vol">

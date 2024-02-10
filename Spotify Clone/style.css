@@ -178,17 +178,7 @@ body{
 #play-bar:hover::-webkit-slider-thumb:hover{
     opacity: 1;
 }
-@media (width < 950px) {
-    body{
-        grid-template-columns: 280px auto;
-    }
-    .song_controls{
-        margin-right: 10%;
-    }
-    .song_vol{
-        display: none;
-    }
-}
+
 @keyframes scrolltext{
     0%{
         transform: translateX(0%);
