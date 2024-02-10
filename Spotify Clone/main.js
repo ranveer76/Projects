@@ -3,6 +3,7 @@
 const web_name = "./songs/";
 let playlist = {};
 
+//edited
 let data;
 var currentsong;
 var song_name;
