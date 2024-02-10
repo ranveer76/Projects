@@ -1,6 +1,8 @@
 // console.log("Welcome");
 // const web_name = (window.location.pathname).split("index")[0]+"songs/";
 const web_name = "./songs/";
+let playlist = {};
+
 let data;
 var currentsong;
 var song_name;
@@ -8,7 +10,7 @@ var song_desc;
 var song_img;
 var duration;
 var current_time;
-var perc=0;
+var perc = 0;
 var color = "#367ae8";
 var playingsong;
 
@@ -28,8 +30,8 @@ function getlocal() {
 function setlocal(data) {
     localStorage.setItem("data", JSON.stringify(data));
 }
-function dataset(e) {
-    currentsong = `./songs/${e.id}`;
+async function dataset(e) {
+    currentsong = e.id;
     song_name = e.getElementsByTagName("h4")[0].innerHTML;
     song_desc = e.getElementsByTagName("p")[0].innerHTML;
     song_img = e.getElementsByTagName("img")[0].src;
@@ -40,9 +42,8 @@ function dataset(e) {
         "songimg": song_img
     }
     setlocal(data);
-    playingsong.src = currentsong;
+    playingsong.src = await play_Song(currentsong.split("/"));
 }
-let playlist = {};
 function doesPlaylistHaveSongs(playlistName) {
     const mp3Extension = ".mp3";
 
@@ -75,61 +76,47 @@ song_img = data['songimg'];
 
 async function getplaylist() {
     try {
-        const response = await fetch(web_name);
-        const data = await response.text();
-        let div = document.createElement('div');
-        div.innerHTML = data;
-        let playlists = {};
-
-        let as = div.getElementsByTagName('a');
-        for (let i = 0; i < as.length; i++) {
-            let x = (as[i].href).split("/songs/");
-            if (x[1] != undefined) {
-                let playlistName = x[1].replaceAll("%20", " ");
-                if (!playlists[playlistName]) {
-                    playlists[playlistName] = [];
-                }
-                playlists[playlistName].push(as[i].title);
-            }
+        const response = await fetch('http://localhost:3000/api/playlists'); // Fetch from the server endpoint
+        const playlists = await response.json();
+        var playlist={};
+        for (const i of playlists) {
+            playlist[i] = await getSongsInPlaylist(i);
         }
-        return playlists;
+        return playlist;
     } catch (e) {
         console.log(e);
     }
 }
-async function getsong() {
+
+async function getSongsInPlaylist(playlistName) {
     try {
-        for (let i in playlist) {
-            const response = await fetch("./songs/" + playlist[i]);
-            const data = await response.text();
-            let div = document.createElement('div');
-            div.innerHTML = data;
-            let as = div.getElementsByTagName('a');
-            for (let j = 0; j < as.length; j++) {
-                let x = as[j].title;
-                if (x.endsWith('.mp3')) {
-                    playlist[i].push(x);
-                }
+        const response = await fetch(`http://localhost:3000/api/playlist/${playlistName}`);
+        const songs = await response.json();
+        let song = [];
+        for (const i of songs) {
+            if(i.endsWith(".mp3")){
+                song.push(i);
             }
         }
+        return song;
     } catch (e) {
         console.log(e);
+        return [];
     }
 }
-
 
 function createElement() {
     let element = document.getElementsByClassName('main')[0];
     for (let i in playlist) {
-        if (doesPlaylistHaveSongs(playlist[i][0])) {
-            element.innerHTML += `<h2>${playlist[i][0]}</h2><div class="list" id="${playlist[i][0]}"></div>`;
-            let e = document.getElementById(playlist[i][0]);
-            for (let j = 1; j < playlist[i].length; j++) {
+        if (doesPlaylistHaveSongs(i)) {
+            element.innerHTML += `<h2>${i}</h2><div class="list" id="${i}"></div>`;
+            let e = document.getElementById(i);
+            for (let j = 0; j < playlist[i].length; j++) {
                 let song_name = playlist[i][j].split(".mp3")[0].split("[")[0];
                 let song_desc = playlist[i][j].split("]")[0].split("[")[1];
                 // console.log(song_desc);
-                e.innerHTML += `<div class="item" id="${playlist[i][0] + '/' + playlist[i][j]}">
-            <img src="./songs/${playlist[i][0]}/${song_name.replaceAll(" ", "")}.jpg" alt="" />
+                e.innerHTML += `<div class="item" id="${i + '/' + playlist[i][j]}">
+            <img src="./songs/${i}/${song_name.replaceAll(" ", "")}.jpg" alt="" />
             <div class="play">
             <img class="p-2" src="./images/play_logo.svg" alt="" />
             </div>
@@ -143,6 +130,19 @@ function createElement() {
         }
     }
 }
+
+// Example client-side code
+const play_Song = async (playlist) => {
+    try {
+        // console.log(playlist);
+        const response = await fetch(`http://localhost:3000/api/songs/${playlist[0]}/${playlist[1]}`);
+        const audioBlob = await response.blob();
+        const audioUrl = await URL.createObjectURL(audioBlob);
+        return audioUrl;
+    } catch (error) {
+        console.error('Error playing song:', error);
+    }
+};
 
 function playsong() {
     try {
@@ -165,36 +165,36 @@ function pausesong() {
     }
     document.getElementById("playpause").src = './images/play_logo.svg';
 }
-function next_play() {
-    let a = currentsong.split('/songs/')[1].split('/');
+async function next_play() {
+    let a = currentsong.split('/');
     let index = playlist[a[0]].indexOf(a[1]);
     // console.log(playlist[a[0]].indexOf(a[1]));
     // console.log(playlist);
     if (index + 1 < playlist[a[0]].length) {
-        let e = document.getElementById(a[0]).getElementsByClassName("item")[index];
+        let e = document.getElementById(a[0]).getElementsByClassName("item")[index+1];
         dataset(e);
-        playingsong.src = currentsong;
+        playingsong.src = await play_Song(currentsong.split("/"));
         playsong();
     } else {
         let e = document.getElementById(a[0]).getElementsByClassName("item")[0];
         dataset(e);
-        playingsong.src = currentsong;
+        playingsong.src = await play_Song(currentsong.split("/"));
         playsong();
     }
 
 }
-function prev_play() {
-    let a = currentsong.split('/songs/')[1].split('/');
-    let index = playlist[a[0]].indexOf(a[1]) - 1;
+async function prev_play() {
+    let a = currentsong.split('/');
+    let index = playlist[a[0]].indexOf(a[1]);
     if (index - 1 >= 0) {
-        let e = document.getElementById(a[0]).getElementsByClassName("item")[index - 1];
+        let e = document.getElementById(a[0]).getElementsByClassName("item")[index -1];
         dataset(e);
-        playingsong.src = currentsong;
+        playingsong.src = await play_Song(currentsong.split("/"));
         playsong();
     } else {
-        let e = document.getElementById(a[0]).getElementsByClassName("item")[playlist[a[0]].length - 2];
+        let e = document.getElementById(a[0]).getElementsByClassName("item")[playlist[a[0]].length - 1];
         dataset(e);
-        playingsong.src = currentsong;
+        playingsong.src = await play_Song(currentsong.split("/"));
         playsong();
     }
 }
@@ -202,9 +202,9 @@ function prev_play() {
 function onclickitem() {
     Array.from(document.getElementsByClassName("list")).forEach(element => {
         Array.from(element.getElementsByClassName("item")).forEach(e => {
-            e.addEventListener("click", function () {
+            e.addEventListener("click", async function () {
                 dataset(e);
-                playingsong.src = currentsong;
+                playingsong.src = await play_Song(currentsong.split("/"));
                 playsong();
             })
         });
@@ -214,16 +214,15 @@ function onclickitem() {
 async function main() {
     try {
         playlist = await getplaylist();
-        // console.log(playlist);
-        await getsong();
         createElement();
+        playingsong = new Audio();
     } catch (e) {
         console.log(e);
     }
 
     updateDynamicContent();
-
-    playingsong = new Audio(currentsong);
+    playingsong.src = await play_Song(currentsong.split("/"));
+    // playingsong.play();
     duration = stm(playingsong.duration);
     current_time = stm(playingsong.currentTime);
 
@@ -240,8 +239,8 @@ async function main() {
 
     var next = document.getElementById("next");
     var prev = document.getElementById("prev");
-    next.addEventListener("click", function () { next_play(); });
-    prev.addEventListener("click", function () { prev_play(); });
+    next.addEventListener("click", async function () { await next_play(); });
+    prev.addEventListener("click", async function () { await prev_play(); });
 
     playingsong.addEventListener("loadeddata", () => {
         duration = stm(playingsong.duration);
@@ -253,7 +252,7 @@ async function main() {
         e.getElementsByTagName("h4")[0].innerHTML = song_name;
         e.getElementsByTagName("p")[0].innerHTML = song_desc;
     });
-    playingsong.addEventListener("timeupdate", () => {
+    playingsong.addEventListener("timeupdate", async () => {
         duration = playingsong.duration;
         current_time = playingsong.currentTime;
         document.getElementById("duration").innerHTML = stm(duration);
@@ -263,10 +262,10 @@ async function main() {
         e.value = parseFloat(perc);
         e.style.background = `linear-gradient(to right,${color} 0%, ${color} ${perc}%, #ffffffba ${perc}%,#ffffffba 100%)`;
         if (current_time >= duration) {
-            next_play();
+            await next_play();
         }
     });
-    var e=document.getElementById("play-bar");
+    var e = document.getElementById("play-bar");
     e.onmouseover = () => {
         color = "#18b459";
         e.style.background = `linear-gradient(to right,${color} 0%, ${color} ${perc}%, #ffffffba ${perc}%,#ffffffba 100%)`;
@@ -287,29 +286,20 @@ async function main() {
 
 
 function updateDynamicContent(callback) {
-    // const text1Elements = document.querySelectorAll(".text p");
 
-    // for (const element of text1Elements) {
-    //     const scrollContainer = element.closest(".text");
-
-    //     if (element.scrollWidth > scrollContainer.offsetWidth) {
-    //         element.classList.add("animate");
-    //         console.log("Overflow Detected!");
-    //     }
-    // }
     const textElements = document.querySelectorAll(".text p");
 
     textElements.forEach(element => {
         const scrollContainer = element.closest(".text");
-        console.log("Element:", element);
-        console.log("Scroll Width:", element.scrollWidth);
-        console.log("Container Width:", scrollContainer.offsetWidth);
+        // console.log("Element:", element);
+        // console.log("Scroll Width:", element.scrollWidth);
+        // console.log("Container Width:", scrollContainer.offsetWidth);
         if (element.scrollWidth > scrollContainer.offsetWidth) {
             element.classList.add("animate");
         } else {
             element.classList.remove("animate");
         }
-        
+
     });
 }
 
