@@ -1,9 +1,8 @@
 // console.log("Welcome");
 // const web_name = (window.location.pathname).split("index")[0]+"songs/";
-const web_name = "./songs/";
+const web_name = "http://10.0.67.117";
 let playlist = {};
 
-//edited
 let data;
 var currentsong;
 var song_name;
@@ -73,7 +72,7 @@ song_desc = data['songdesc'];
 
 async function getplaylist() {
     try {
-        const response = await fetch('http://localhost:3000/api/playlists'); // Fetch from the server endpoint
+        const response = await fetch(web_name+':3000/api/playlists'); // Fetch from the server endpoint
         const playlists = await response.json();
         var playlist = {};
         for (const i of playlists) {
@@ -87,7 +86,7 @@ async function getplaylist() {
 
 async function getSongsInPlaylist(playlistName) {
     try {
-        const response = await fetch(`http://localhost:3000/api/playlist/${playlistName}`);
+        const response = await fetch(`${web_name}:3000/api/playlist/${playlistName}`);
         const songs = await response.json();
         let song = [];
         for (const i of songs) {
@@ -131,7 +130,7 @@ async function createElement() {
 }
 async function getImageUrl(p, songPath) {
     try {
-        const response = await fetch(`http://localhost:3000/api/images/${p}/${songPath}`);
+        const response = await fetch(`${web_name}:3000/api/images/${p}/${songPath}`);
         const imageBlob = await response.blob();
         const imageUrl = await URL.createObjectURL(imageBlob);
         return imageUrl;
@@ -143,7 +142,7 @@ async function getImageUrl(p, songPath) {
 const play_Song = async (playlist) => {
     try {
         // console.log(playlist);
-        const response = await fetch(`http://localhost:3000/api/songs/${playlist[0]}/${playlist[1]}`);
+        const response = await fetch(`${web_name}:3000/api/songs/${playlist[0]}/${playlist[1]}`);
         const audioBlob = await response.blob();
         const audioUrl = await URL.createObjectURL(audioBlob);
         return audioUrl;
