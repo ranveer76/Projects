@@ -1,6 +1,6 @@
 // console.log("Welcome");
 // const web_name = (window.location.pathname).split("index")[0]+"songs/";
-const web_name = "http://10.0.67.117";
+const web_name = "http://192.168.43.38";
 let playlist = {};
 
 let data;
