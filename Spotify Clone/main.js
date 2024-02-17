@@ -9,7 +9,9 @@ var song_name;
 var song_desc;
 var song_img;
 var duration;
+var total_size;
 var current_time;
+var prev_time = 0;
 var perc = 0;
 var color = "#367ae8";
 var playingsong;
@@ -145,14 +147,19 @@ async function getImageUrl(p, songPath) {
     }
 }
 // Example client-side code
-const play_Song = async (playlist) => {
+const play_Song = async (playlist,startByte,endByte) => {
     try {
         // console.log(playlist);
         const response = await fetch(`${web_name}/api/songs/${playlist[0]}/${playlist[1]}`,{
             mode:'cors',//Enable Cors
+            headers: {
+                'Range': `bytes=${startByte}-${endByte}`
+            }
     });
         const audioBlob = await response.blob();
         const audioUrl = await URL.createObjectURL(audioBlob);
+        // total_size = response.headers.get('Total-Size');
+        // duration  = response.headers.get('Content-Range').split('/')[1];
         return audioUrl;
     } catch (error) {
         console.error('Error playing song:', error);
@@ -183,17 +190,18 @@ function pausesong() {
 async function next_play() {
     let a = currentsong.split('/');
     let index = playlist[a[0]].indexOf(a[1]);
+    prev_time = 0;
     // console.log(playlist[a[0]].indexOf(a[1]));
     // console.log(playlist);
     if (index + 1 < playlist[a[0]].length) {
         let e = document.getElementById(a[0]).getElementsByClassName("item")[index + 1];
         dataset(e);
-        playingsong.src = await play_Song(currentsong.split("/"));
+        playingsong.src = await play_Song(currentsong.split("/"),0,4000000);
         playsong();
     } else {
         let e = document.getElementById(a[0]).getElementsByClassName("item")[0];
         dataset(e);
-        playingsong.src = await play_Song(currentsong.split("/"));
+        playingsong.src = await play_Song(currentsong.split("/"),0,4000000);
         playsong();
     }
 
@@ -201,15 +209,16 @@ async function next_play() {
 async function prev_play() {
     let a = currentsong.split('/');
     let index = playlist[a[0]].indexOf(a[1]);
+    prev_time = 0;
     if (index - 1 >= 0) {
         let e = document.getElementById(a[0]).getElementsByClassName("item")[index - 1];
         dataset(e);
-        playingsong.src = await play_Song(currentsong.split("/"));
+        playingsong.src = await play_Song(currentsong.split("/"),0,4000000);
         playsong();
     } else {
         let e = document.getElementById(a[0]).getElementsByClassName("item")[playlist[a[0]].length - 1];
         dataset(e);
-        playingsong.src = await play_Song(currentsong.split("/"));
+        playingsong.src = await play_Song(currentsong.split("/"),0,4000000);
         playsong();
     }
 }
@@ -220,7 +229,8 @@ function onclickitem() {
             // console.log(e);
             e.addEventListener("click", async function () {
                 dataset(e);
-                playingsong.src = await play_Song(currentsong.split("/"));
+                prev_time = 0;
+                playingsong.src = await play_Song(currentsong.split("/"),0,4000000);
                 playsong();
             })
         });
@@ -232,15 +242,13 @@ async function main() {
         playlist = await getplaylist();
         createElement();
         playingsong = new Audio();
-        console.log(playlist);
+        // console.log(playlist);
     } catch (e) {
         console.log(e);
     }
     song_img = await getImageUrl(currentsong.split("/")[0], song_name.replaceAll(" ", "") + ".jpg");
-    playingsong.src = await play_Song(currentsong.split("/"));
+    playingsong.src = await play_Song(currentsong.split("/"),0,4000000);
     // playingsong.play();
-    duration = stm(playingsong.duration);
-    current_time = stm(playingsong.currentTime);
 
     // console.log(currentsong);
     document.getElementById("playpause").addEventListener("click", function () {
@@ -256,11 +264,13 @@ async function main() {
     var prev = document.getElementById("prev");
     next.addEventListener("click", async function () { await next_play(); });
     prev.addEventListener("click", async function () { await prev_play(); });
+
+
     playingsong.addEventListener("loadeddata", () => {
-        duration = stm(playingsong.duration);
-        current_time = stm(playingsong.currentTime);
-        document.getElementById("duration").innerHTML = duration;
-        document.getElementById("current_time").innerHTML = current_time;
+        duration = playingsong.duration;
+        current_time = playingsong.currentTime + prev_time;
+        document.getElementById("duration").innerHTML = stm(duration);
+        document.getElementById("current_time").innerHTML = stm(current_time);
         let e = document.getElementsByClassName("song_info")[0];
         e.getElementsByTagName("img")[0].src = song_img;
         e.getElementsByTagName("h4")[0].innerHTML = song_name;
@@ -268,8 +278,7 @@ async function main() {
         updateDynamicContent();
     });
     playingsong.addEventListener("timeupdate", async () => {
-        duration = playingsong.duration;
-        current_time = playingsong.currentTime;
+        current_time = playingsong.currentTime + prev_time;
         document.getElementById("duration").innerHTML = stm(duration);
         let e = document.getElementById("play-bar");
         document.getElementById("current_time").innerHTML = stm(current_time);
