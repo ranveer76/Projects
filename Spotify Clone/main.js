@@ -1,6 +1,6 @@
 // console.log("Welcome");
 // const web_name = (window.location.pathname).split("index")[0]+"songs/";
-const web_name = "http://192.168.43.38";
+const web_name = "https://server-six-rosy-57.vercel.app";
 let playlist = {};
 
 let data;
@@ -72,7 +72,9 @@ song_desc = data['songdesc'];
 
 async function getplaylist() {
     try {
-        const response = await fetch(web_name+':3000/api/playlists'); // Fetch from the server endpoint
+        const response = await fetch(web_name+'/api/playlists',{
+            mode:'cors',//Enable Cors
+    }); // Fetch from the server endpoint
         const playlists = await response.json();
         var playlist = {};
         for (const i of playlists) {
@@ -86,7 +88,9 @@ async function getplaylist() {
 
 async function getSongsInPlaylist(playlistName) {
     try {
-        const response = await fetch(`${web_name}:3000/api/playlist/${playlistName}`);
+        const response = await fetch(`${web_name}/api/playlist/${playlistName}`,{
+            mode:'cors',//Enable Cors
+    });
         const songs = await response.json();
         let song = [];
         for (const i of songs) {
@@ -130,7 +134,9 @@ async function createElement() {
 }
 async function getImageUrl(p, songPath) {
     try {
-        const response = await fetch(`${web_name}:3000/api/images/${p}/${songPath}`);
+        const response = await fetch(`${web_name}/api/images/${p}/${songPath}`,{
+            mode:'cors',//Enable Cors
+    });
         const imageBlob = await response.blob();
         const imageUrl = await URL.createObjectURL(imageBlob);
         return imageUrl;
@@ -142,7 +148,9 @@ async function getImageUrl(p, songPath) {
 const play_Song = async (playlist) => {
     try {
         // console.log(playlist);
-        const response = await fetch(`${web_name}:3000/api/songs/${playlist[0]}/${playlist[1]}`);
+        const response = await fetch(`${web_name}/api/songs/${playlist[0]}/${playlist[1]}`,{
+            mode:'cors',//Enable Cors
+    });
         const audioBlob = await response.blob();
         const audioUrl = await URL.createObjectURL(audioBlob);
         return audioUrl;
@@ -224,6 +232,7 @@ async function main() {
         playlist = await getplaylist();
         createElement();
         playingsong = new Audio();
+        console.log(playlist);
     } catch (e) {
         console.log(e);
     }
